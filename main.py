@@ -4,7 +4,7 @@ import flet as ft
 from pathlib import Path
 from flet import View, Page, AppBar, ElevatedButton, Text, RouteChangeEvent, ViewPopEvent
 from flet import CrossAxisAlignment, MainAxisAlignment, Image, NavigationDrawer, NavigationDrawerDestination
-from flet import FloatingActionButton, FloatingActionButtonLocation, BottomAppBar
+from flet import FloatingActionButton, FloatingActionButtonLocation, BottomAppBar, Row, ListView
 
 matplotlib.use("svg")
 csv_dir = ''
@@ -29,9 +29,9 @@ def main(page: Page) -> None:
             allowed_extensions=['csv'],
             initial_directory=downloads_path
         )
-
+        
         page.views.clear()
-
+        page.title = "Guardado!"
         page.views.append(
             View(
                 route='/CSV',
@@ -84,7 +84,7 @@ def main(page: Page) -> None:
 
     def route_changes(e: RouteChangeEvent) -> None:
         page.views.clear()
-
+        page.title = "Exploración de datos"
         page.views.append(
             View(
                 route='/CSV',
@@ -134,10 +134,60 @@ def main(page: Page) -> None:
         )
 
         if page.route == '/proyecto':
+            page.title = "Exploración de datos"
             page.views.append(
                 View(
                     route='/proyecto',
                     controls=[
+                        Text("Librerias", theme_style=ft.TextThemeStyle.TITLE_LARGE),
+                        Row(
+                            controls=[
+                                Text("Las siguientes librerias fueron utilizadas")
+                            ], 
+                            alignment=MainAxisAlignment.CENTER,
+                        ),
+                        Row(
+                            controls=[
+                                ListView(
+                                    controls=[
+                                        Text("Pandas"),
+                                        Text("NumPy"),
+                                        Text("Seaborn"),
+                                        Text("Empoji"),
+                                        Text("NLTK"),
+                                        Text("Sentiment Analysis Spanish"),
+                                        Text("Transformers"),
+                                        Text("MatPlotLib.PyPlot"),
+                                        Text("Word Cloud"),                            
+                                    ],
+                                )
+                            ],
+                        ),
+                        Row(
+                            controls=[
+                                Text(
+                                    "Primero Modificamos los datos al agregarles dos columnas al"
+                                    +" dataframe con el numero de caracteres y palabras respectivamente"
+                                    +" para poder utilizar esos datos más adelante"
+                                ),
+                            ],
+                            width=page.window_width,
+                            wrap=True,
+                            alignment=MainAxisAlignment.CENTER
+                        ),
+                        Image(src=r"img\Code_img_colums_added.png"),
+                        Row(
+                            [Text("Ya con esos datos hicimos los siguentes dos histogramas, que representan las frecuencias de cantidad de caracteres y palabras respectivamente")],
+                            width=page.window_width,
+                            wrap=True
+                        ),
+                        Row(
+                            [
+                                Image(src=r"img\caracteres.svg", width=200, height=200),
+                                Image(src=r"img\palabras.svg", width=200, height=200)
+                            ],
+                            alignment=MainAxisAlignment.CENTER
+                        ),
                         BottomAppBar(
                             bgcolor=ft.colors.BLUE,
                             content=ft.Row(
@@ -159,8 +209,8 @@ def main(page: Page) -> None:
                         #),
                         #ElevatedButton("cargar CSV",icon="TABLE_VIEW")
                     ],
-                    vertical_alignment=MainAxisAlignment.CENTER,
-                    horizontal_alignment=CrossAxisAlignment.CENTER
+                    horizontal_alignment=CrossAxisAlignment.CENTER,
+                    scroll='HIDDEN'
                 )
             )
 
