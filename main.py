@@ -2,6 +2,8 @@ import time
 import matplotlib
 import matplotlib.pyplot as plt
 import flet as ft
+from libs.visualizations import csv_to_hist
+from libs.MPA import Db_Analisis
 from pathlib import Path
 from flet import View, Page, AppBar, ElevatedButton, Text, RouteChangeEvent, ViewPopEvent
 from flet import CrossAxisAlignment, MainAxisAlignment, Image, NavigationDrawer, NavigationDrawerDestination
@@ -9,12 +11,124 @@ from flet import FloatingActionButton, FloatingActionButtonLocation, BottomAppBa
 
 matplotlib.use("svg")
 csv_dir = ''
+x = 1
 
 def main(page: Page) -> None:
+    global x
     page.title="Sentiment Analysis"
     page.window_width = 600
     page.window_height = 600
     downloads_path = str(Path.home() / "Downloads")
+
+    def fwd(x: int) -> None:
+        if x in range(1,13):
+            x += 1
+        elif x not in range(1,13):
+            x -= 1
+        page.title = 'Histograma'
+        page.views.append(
+                View(
+                    route='/histograma',
+                    controls=[
+                        Row(
+                            [
+                                ft.IconButton(
+                                    icon=ft.icons.ARROW_BACK_IOS,
+                                    on_click=lambda _: bwd(x)
+                                ),
+                                Image(
+                                    src=f"data\hist_{x}_2023.svg",
+                                    width=350,
+                                    height=350
+                                ),
+                                ft.IconButton(
+                                    icon=ft.icons.ARROW_FORWARD_IOS,
+                                    on_click=lambda _: fwd(x)
+                                )
+                            ]
+                        ),
+                        BottomAppBar(
+                            bgcolor=ft.colors.BLUE,
+                            content=ft.Row(
+                                controls=[
+                                    ft.IconButton(icon=ft.icons.CO_PRESENT, icon_color=ft.colors.WHITE, tooltip="Exploración de datos", on_click=lambda _: page.go('/proyecto')),
+                                    ft.IconButton(icon=ft.icons.BAR_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Histograma", on_click=lambda _: page.go('/histograma')),
+                                ft.IconButton(icon=ft.icons.CHECK_CIRCLE_OUTLINED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
+                                    ft.Container(expand=True),
+                                    FloatingActionButton(icon=ft.icons.ARROW_BACK, tooltip="Regresar", on_click=lambda _: page.go('/CSV')),
+                                    #ft.Container(expand=True),
+                                    #ft.IconButton(icon=ft.icons.SEARCH, icon_color=ft.colors.WHITE),
+                                ]
+                            ),
+                        )
+                        #Image(
+                        #    src=r'img\caracteres.svg',
+                        #    width=300,
+                        #    height=300
+                        #),
+                        #ElevatedButton("cargar CSV",icon="TABLE_VIEW")
+                    ],
+                    vertical_alignment=MainAxisAlignment.CENTER,
+                    horizontal_alignment=CrossAxisAlignment.CENTER
+                )
+            )
+        page.update()
+
+    def bwd(x: int) -> None:
+        if x in range(1,13):
+            x -= 1
+        elif x not in range(1,13):
+            x += 1
+        
+        page.title = 'Histograma'
+        page.views.append(
+                View(
+                    route='/histograma',
+                    controls=[
+                        Row(
+                            [
+                                ft.IconButton(
+                                    icon=ft.icons.ARROW_BACK_IOS,
+                                    on_click=lambda _: bwd(x)
+                                ),
+                                Image(
+                                    src=f"data\hist_{x}_2023.svg",
+                                    width=350,
+                                    height=350
+                                ),
+                                ft.IconButton(
+                                    icon=ft.icons.ARROW_FORWARD_IOS,
+                                    on_click=lambda _: fwd(x)
+                                )
+                            ]
+                        ),
+                        BottomAppBar(
+                            bgcolor=ft.colors.BLUE,
+                            content=ft.Row(
+                                controls=[
+                                    ft.IconButton(icon=ft.icons.CO_PRESENT, icon_color=ft.colors.WHITE, tooltip="Exploración de datos", on_click=lambda _: page.go('/proyecto')),
+                                    ft.IconButton(icon=ft.icons.BAR_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Histograma", on_click=lambda _: page.go('/histograma')),
+                                ft.IconButton(icon=ft.icons.CHECK_CIRCLE_OUTLINED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
+                                    ft.Container(expand=True),
+                                    FloatingActionButton(icon=ft.icons.ARROW_BACK, tooltip="Regresar", on_click=lambda _: page.go('/CSV')),
+                                    #ft.Container(expand=True),
+                                    #ft.IconButton(icon=ft.icons.SEARCH, icon_color=ft.colors.WHITE),
+                                ]
+                            ),
+                        )
+                        #Image(
+                        #    src=r'img\caracteres.svg',
+                        #    width=300,
+                        #    height=300
+                        #),
+                        #ElevatedButton("cargar CSV",icon="TABLE_VIEW")
+                    ],
+                    vertical_alignment=MainAxisAlignment.CENTER,
+                    horizontal_alignment=CrossAxisAlignment.CENTER
+                )
+            )
+
+        page.update()
 
     def on_dialog_result(e: ft.FilePickerResultEvent):
         global csv_dir
@@ -31,9 +145,10 @@ def main(page: Page) -> None:
             initial_directory=downloads_path
         )
         
-        #while not csv_dir:
-        #    continue
-        #print(csv_dir)
+        while not csv_dir:
+            continue
+
+        csv_to_hist(Db_Analisis(csv_dir))
         
         page.views.clear()
         page.title = "Guardado!"
@@ -56,7 +171,7 @@ def main(page: Page) -> None:
                             controls=[
                                 ft.IconButton(icon=ft.icons.CO_PRESENT, icon_color=ft.colors.WHITE, tooltip="Exploración de datos", on_click=lambda _: page.go('/proyecto')),
                                 ft.IconButton(icon=ft.icons.BAR_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Histograma", on_click=lambda _: page.go('/histograma')),
-                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
+                                ft.IconButton(icon=ft.icons.CHECK_CIRCLE_OUTLINED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
                                 ft.Container(expand=True),
                                 FloatingActionButton(
                                     icon=ft.icons.ADD, 
@@ -89,7 +204,7 @@ def main(page: Page) -> None:
 
     def route_changes(e: RouteChangeEvent) -> None:
         page.views.clear()
-        page.title = "Exploración de datos"
+        page.title = "Añade un archivo CSV"
         page.views.append(
             View(
                 route='/CSV',
@@ -109,7 +224,7 @@ def main(page: Page) -> None:
                             controls=[
                                 ft.IconButton(icon=ft.icons.CO_PRESENT, icon_color=ft.colors.WHITE, tooltip="Exploración de datos", on_click=lambda _: page.go('/proyecto')),
                                 ft.IconButton(icon=ft.icons.BAR_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Histograma", on_click=lambda _: page.go('/histograma')),
-                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
+                                ft.IconButton(icon=ft.icons.CHECK_CIRCLE_OUTLINED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
                                 ft.Container(expand=True),
                                 FloatingActionButton(
                                     icon=ft.icons.ADD, 
@@ -139,7 +254,7 @@ def main(page: Page) -> None:
         )
 
         if page.route == '/proyecto':
-            page.title = "Exploración de datos"
+            page.title = "Presentación"
             page.views.append(
                 View(
                     route='/proyecto',
@@ -209,7 +324,7 @@ def main(page: Page) -> None:
                                 controls=[
                                     ft.IconButton(icon=ft.icons.CO_PRESENT, icon_color=ft.colors.WHITE, tooltip="Exploración de datos", on_click=lambda _: page.go('/proyecto')),
                                     ft.IconButton(icon=ft.icons.BAR_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Histograma", on_click=lambda _: page.go('/histograma')),
-                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
+                                ft.IconButton(icon=ft.icons.CHECK_CIRCLE_OUTLINED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
                                     ft.Container(expand=True),
                                     FloatingActionButton(icon=ft.icons.ARROW_BACK, tooltip="Regresar", on_click=lambda _: page.go('/CSV')),
                                     #ft.Container(expand=True),
@@ -230,17 +345,35 @@ def main(page: Page) -> None:
             )
 
         if page.route == '/histograma' and csv_dir != '':
+            page.title = 'Histograma'
             page.views.append(
                 View(
                     route='/histograma',
                     controls=[
+                        Row(
+                            [
+                                ft.IconButton(
+                                    icon=ft.icons.ARROW_BACK_IOS,
+                                    on_click=lambda _: bwd(x)
+                                ),
+                                Image(
+                                    src=f"data\hist_{x}_2023.svg",
+                                    width=350,
+                                    height=350
+                                ),
+                                ft.IconButton(
+                                    icon=ft.icons.ARROW_FORWARD_IOS,
+                                    on_click=lambda _: fwd(x)
+                                )
+                            ]
+                        ),
                         BottomAppBar(
                             bgcolor=ft.colors.BLUE,
                             content=ft.Row(
                                 controls=[
                                     ft.IconButton(icon=ft.icons.CO_PRESENT, icon_color=ft.colors.WHITE, tooltip="Exploración de datos", on_click=lambda _: page.go('/proyecto')),
                                     ft.IconButton(icon=ft.icons.BAR_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Histograma", on_click=lambda _: page.go('/histograma')),
-                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
+                                ft.IconButton(icon=ft.icons.CHECK_CIRCLE_OUTLINED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
                                     ft.Container(expand=True),
                                     FloatingActionButton(icon=ft.icons.ARROW_BACK, tooltip="Regresar", on_click=lambda _: page.go('/CSV')),
                                     #ft.Container(expand=True),
@@ -260,7 +393,8 @@ def main(page: Page) -> None:
                 )
             )
 
-        if page.route == '/validacion' and csv_dir != '':
+        if page.route == '/validacion':
+            page.title = "Validación de Twit"
             page.views.append(
                 View(
                     route='/validacion',
@@ -271,7 +405,7 @@ def main(page: Page) -> None:
                                 controls=[
                                     ft.IconButton(icon=ft.icons.CO_PRESENT, icon_color=ft.colors.WHITE, tooltip="Exploración de datos", on_click=lambda _: page.go('/proyecto')),
                                     ft.IconButton(icon=ft.icons.BAR_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Histograma", on_click=lambda _: page.go('/histograma')),
-                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
+                                ft.IconButton(icon=ft.icons.CHECK_CIRCLE_OUTLINED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
                                     ft.Container(expand=True),
                                     FloatingActionButton(icon=ft.icons.ARROW_BACK, tooltip="Regresar", on_click=lambda _: page.go('/CSV')),
                                     #ft.Container(expand=True),
