@@ -1,3 +1,4 @@
+import time
 import matplotlib
 import matplotlib.pyplot as plt
 import flet as ft
@@ -30,6 +31,10 @@ def main(page: Page) -> None:
             initial_directory=downloads_path
         )
         
+        #while not csv_dir:
+        #    continue
+        #print(csv_dir)
+        
         page.views.clear()
         page.title = "Guardado!"
         page.views.append(
@@ -51,7 +56,7 @@ def main(page: Page) -> None:
                             controls=[
                                 ft.IconButton(icon=ft.icons.CO_PRESENT, icon_color=ft.colors.WHITE, tooltip="Exploración de datos", on_click=lambda _: page.go('/proyecto')),
                                 ft.IconButton(icon=ft.icons.BAR_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Histograma", on_click=lambda _: page.go('/histograma')),
-                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Cluster map", on_click=lambda _: page.go('/cluster')),
+                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
                                 ft.Container(expand=True),
                                 FloatingActionButton(
                                     icon=ft.icons.ADD, 
@@ -104,7 +109,7 @@ def main(page: Page) -> None:
                             controls=[
                                 ft.IconButton(icon=ft.icons.CO_PRESENT, icon_color=ft.colors.WHITE, tooltip="Exploración de datos", on_click=lambda _: page.go('/proyecto')),
                                 ft.IconButton(icon=ft.icons.BAR_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Histograma", on_click=lambda _: page.go('/histograma')),
-                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Cluster map", on_click=lambda _: page.go('/cluster')),
+                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
                                 ft.Container(expand=True),
                                 FloatingActionButton(
                                     icon=ft.icons.ADD, 
@@ -142,7 +147,7 @@ def main(page: Page) -> None:
                         Text("Librerias", theme_style=ft.TextThemeStyle.TITLE_LARGE),
                         Row(
                             controls=[
-                                Text("Las siguientes librerias fueron utilizadas")
+                                Text("Las siguientes librerias fueron utilizadas", size=20)
                             ], 
                             alignment=MainAxisAlignment.CENTER,
                         ),
@@ -153,7 +158,7 @@ def main(page: Page) -> None:
                                         Text("Pandas"),
                                         Text("NumPy"),
                                         Text("Seaborn"),
-                                        Text("Empoji"),
+                                        Text("Emoji"),
                                         Text("NLTK"),
                                         Text("Sentiment Analysis Spanish"),
                                         Text("Transformers"),
@@ -163,38 +168,48 @@ def main(page: Page) -> None:
                                 )
                             ],
                         ),
+                        Text("Limpieza de Datos", theme_style=ft.TextThemeStyle.TITLE_LARGE),
                         Row(
                             controls=[
                                 Text(
-                                    "Primero Modificamos los datos al agregarles dos columnas al"
-                                    +" dataframe con el numero de caracteres y palabras respectivamente"
-                                    +" para poder utilizar esos datos más adelante"
+                                    "Etiquetamos los datos con dos columnas, siendo estas"
+                                    + " relevancia y tema respectivamente.",
+                                    size=20
                                 ),
                             ],
                             width=page.window_width,
                             wrap=True,
                             alignment=MainAxisAlignment.CENTER
                         ),
-                        Image(src=r"img\Code_img_colums_added.png"),
+                        Image(src=r"img\relevance_topic_cols.png"),
                         Row(
-                            [Text("Ya con esos datos hicimos los siguentes dos histogramas, que representan las frecuencias de cantidad de caracteres y palabras respectivamente")],
+                            controls=[
+                                Text(
+                                    "Despues se agregó una columna con la cantidad de palabras en cada twit",
+                                    size=20
+                                ),
+                            ],
                             width=page.window_width,
-                            wrap=True
+                            wrap=True,
+                            alignment=MainAxisAlignment.CENTER
                         ),
+                        Image(src=r"img\words_col.png"),
+                        Text("Graficas Varias", theme_style=ft.TextThemeStyle.TITLE_LARGE),
                         Row(
                             [
-                                Image(src=r"img\caracteres.svg", width=200, height=200),
-                                Image(src=r"img\palabras.svg", width=200, height=200)
+                                Image(src=r"img\palabras.png", width=400, height=400)
                             ],
                             alignment=MainAxisAlignment.CENTER
                         ),
+                        Text("Esta grafica es de la cantidad de palabras por twit", size=20),
+                        Image(src="img\rating_col.png"),
                         BottomAppBar(
                             bgcolor=ft.colors.BLUE,
                             content=ft.Row(
                                 controls=[
                                     ft.IconButton(icon=ft.icons.CO_PRESENT, icon_color=ft.colors.WHITE, tooltip="Exploración de datos", on_click=lambda _: page.go('/proyecto')),
                                     ft.IconButton(icon=ft.icons.BAR_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Histograma", on_click=lambda _: page.go('/histograma')),
-                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Cluster map", on_click=lambda _: page.go('/cluster')),
+                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
                                     ft.Container(expand=True),
                                     FloatingActionButton(icon=ft.icons.ARROW_BACK, tooltip="Regresar", on_click=lambda _: page.go('/CSV')),
                                     #ft.Container(expand=True),
@@ -225,7 +240,7 @@ def main(page: Page) -> None:
                                 controls=[
                                     ft.IconButton(icon=ft.icons.CO_PRESENT, icon_color=ft.colors.WHITE, tooltip="Exploración de datos", on_click=lambda _: page.go('/proyecto')),
                                     ft.IconButton(icon=ft.icons.BAR_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Histograma", on_click=lambda _: page.go('/histograma')),
-                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Cluster map", on_click=lambda _: page.go('/cluster')),
+                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
                                     ft.Container(expand=True),
                                     FloatingActionButton(icon=ft.icons.ARROW_BACK, tooltip="Regresar", on_click=lambda _: page.go('/CSV')),
                                     #ft.Container(expand=True),
@@ -245,10 +260,10 @@ def main(page: Page) -> None:
                 )
             )
 
-        if page.route == '/cluster' and csv_dir != '':
+        if page.route == '/validacion' and csv_dir != '':
             page.views.append(
                 View(
-                    route='/cluster',
+                    route='/validacion',
                     controls=[
                         BottomAppBar(
                             bgcolor=ft.colors.BLUE,
@@ -256,7 +271,7 @@ def main(page: Page) -> None:
                                 controls=[
                                     ft.IconButton(icon=ft.icons.CO_PRESENT, icon_color=ft.colors.WHITE, tooltip="Exploración de datos", on_click=lambda _: page.go('/proyecto')),
                                     ft.IconButton(icon=ft.icons.BAR_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Histograma", on_click=lambda _: page.go('/histograma')),
-                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Cluster map", on_click=lambda _: page.go('/cluster')),
+                                ft.IconButton(icon=ft.icons.BUBBLE_CHART_ROUNDED, icon_color=ft.colors.WHITE, tooltip="Validación de Twit", on_click=lambda _: page.go('/validacion')),
                                     ft.Container(expand=True),
                                     FloatingActionButton(icon=ft.icons.ARROW_BACK, tooltip="Regresar", on_click=lambda _: page.go('/CSV')),
                                     #ft.Container(expand=True),
