@@ -24,6 +24,12 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
+modelSentiment = load(r'data\modelSentiment.joblib')
+scaler = load(r'data\scaler.joblib')
+vectorizer = load(r'data\vectorizer.joblib')
+modelRel = load(r'data\modelRel.joblib')
+modelTopic = load(r'data\modelTopic.joblib')
+
 def Db_Analisis(route: str) -> str:
     df = pd.read_csv(route)
     df['date'] = pd.to_datetime(df['date'], format="%d/%m/%Y")
@@ -71,9 +77,6 @@ def Db_Analisis(route: str) -> str:
     df = df.loc[df['procTweet'] != '', :]
 
     #predecir sentimiento
-    modelSentiment = load(r'data\modelSentiment.joblib')
-    scaler = load(r'data\scaler.joblib')
-    vectorizer = load(r'data\vectorizer.joblib')
 
     corpus = []
     stemmer = PorterStemmer()
@@ -92,11 +95,29 @@ def Db_Analisis(route: str) -> str:
     df['Sentimiento'] = modelSentiment.predict(X)
 
     #predecir relevancia
-    modelRel = load(r'data\modelRel.joblib')
     df['relevance'] = modelRel.predict(X)
 
     #predecir topic
-    modelTopic = load(r'data\modelTopic.joblib')
     df['topic'] = modelTopic.predict(X) 
     df.to_csv('OUT\dbParaAnalisis.csv', index = False)
     return 'OUT\dbParaAnalisis.csv'
+
+def validate(msg) -> dict:
+
+    orig = msg
+    corpus = []
+    stemmer = PorterStemmer()
+    review = re.sub('[^a-zA-Z]', ' ', msg)
+    review = review.lower().split()
+    review = [stemmer.stem(word) for word in review if not word in STOPWORDS]
+    review = ' '.join(review)
+    corpus.append(review)
+        
+    msg = vectorizer.transform(corpus).toarray()
+    msg = scaler.transform(msg)
+    resultado = {'Mensaje': orig,
+                 'Sentimiento': modelSentiment.predict(msg)[0],
+                 'Relevancia': modelRel.predict(msg)[0],
+                 'Topico': modelTopic.predict(msg)[0]}
+
+    return resultado

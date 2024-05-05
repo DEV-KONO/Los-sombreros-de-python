@@ -4,21 +4,46 @@ import matplotlib.pyplot as plt
 import flet as ft
 from libs.visualizations import csv_to_hist
 from libs.MPA import Db_Analisis
+from libs.MPA import validate
 from pathlib import Path
 from flet import View, Page, AppBar, ElevatedButton, Text, RouteChangeEvent, ViewPopEvent
-from flet import CrossAxisAlignment, MainAxisAlignment, Image, NavigationDrawer, NavigationDrawerDestination
-from flet import FloatingActionButton, FloatingActionButtonLocation, BottomAppBar, Row, ListView
+from flet import CrossAxisAlignment, MainAxisAlignment, Image, TextField
+from flet import FloatingActionButton, BottomAppBar, Row, ListView
 
 matplotlib.use("svg")
 csv_dir = ''
 x = 1
 
 def main(page: Page) -> None:
-    global x
     page.title="Sentiment Analysis"
     page.window_width = 600
     page.window_height = 600
     downloads_path = str(Path.home() / "Downloads")
+
+    def t_changed(e):
+        val_1.visible = False
+        val_2.visible = False
+        val_3.visible = False
+        val_4.visible = False
+        val_5.visible = False
+        val_6.visible = False
+        resultados = validate(e.control.value)
+        if resultados["Sentimiento"]:
+            val_1.visible = True
+        else:
+            val_2.visible = True
+        
+        if resultados["Relevancia"]:
+            val_3.visible = True
+        else:
+            val_4.visible = True
+
+        if resultados["Topico"] == 'support':
+            val_5.visible = True
+        else:
+            val_6.visible = True
+            
+        page.update()
 
     def fwd(x: int) -> None:
         if x in range(1,13):
@@ -203,6 +228,8 @@ def main(page: Page) -> None:
 
 
     def route_changes(e: RouteChangeEvent) -> None:
+        global x
+        page.update()
         page.views.clear()
         page.title = "Añade un archivo CSV"
         page.views.append(
@@ -351,7 +378,7 @@ def main(page: Page) -> None:
                     route='/histograma',
                     controls=[
                         Row(
-                            [
+                            [   
                                 ft.IconButton(
                                     icon=ft.icons.ARROW_BACK_IOS,
                                     on_click=lambda _: bwd(x)
@@ -394,11 +421,37 @@ def main(page: Page) -> None:
             )
 
         if page.route == '/validacion':
+            global val_1, val_2, val_3, val_4, val_5, val_6
+            val_1 = ft.Icon(name=ft.icons.THUMB_UP, color=ft.colors.GREEN, visible=False, tooltip="Análisis sentimental positivo")
+            val_2 = ft.Icon(name=ft.icons.THUMB_DOWN, color=ft.colors.RED, visible=False, tooltip="Análisis sentimental negativo")
+            val_3 = ft.Icon(name=ft.icons.MENU_BOOK, color=ft.colors.GREEN, visible=False, tooltip="Relevante")
+            val_4 = ft.Icon(name=ft.icons.NOT_INTERESTED, color=ft.colors.RED, visible=False, tooltip="No Relevante")
+            val_5 = ft.Icon(name=ft.icons.HEADSET_MIC, color=ft.colors.BLUE, visible=False, tooltip="Soporte Tecnico")
+            val_6 = ft.Icon(name=ft.icons.DIVERSITY_3, color=ft.colors.BLUE, visible=False, tooltip="Miselaneo")
+            page.add(val_1, val_2, val_3, val_4, val_5, val_6)
             page.title = "Validación de Twit"
             page.views.append(
                 View(
                     route='/validacion',
                     controls=[
+                        Row(
+                            [   
+                                TextField(
+                                    label="Inserta Un Tweet:",
+                                    on_change=t_changed
+                                )
+                            ]
+                        ),
+                        Row(
+                            [
+                                val_1,
+                                val_2,
+                                val_3,
+                                val_4,
+                                val_5,
+                                val_6
+                            ]
+                        ),
                         BottomAppBar(
                             bgcolor=ft.colors.BLUE,
                             content=ft.Row(
