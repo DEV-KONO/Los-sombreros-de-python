@@ -393,7 +393,7 @@ def main(page: Page) -> None:
                 )
             )
 
-        if page.route == '/validacion' and csv_dir != '':
+        if page.route == '/validacion':
             page.title = "Validación de Twit"
             page.views.append(
                 View(
