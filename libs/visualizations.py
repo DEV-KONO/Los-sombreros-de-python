@@ -2,10 +2,11 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from libs.Year_Range import y_range
 from wordcloud import WordCloud
 
 
-def csv_to_hist(route: str):
+def csv_to_hist(route: str) -> str:
     df = pd.read_csv(route)
     df['date'] = pd.to_datetime(df['date'])
     df['Positivo'] = df['Sentimiento']
@@ -65,5 +66,8 @@ def csv_to_hist(route: str):
         # Use absolute value for y-ticks
         ticks =  ax.get_yticks()
         ax.set_yticklabels([int(abs(tick)) for tick in ticks])
+        plt.savefig(f'data\\hist_{mes}_{año}')
 
-    grafico_comentarios(5, 2023)
+    for año in y_range(route):
+        for mes in range(1,13):
+            grafico_comentarios(mes,año)
